@@ -1,4 +1,4 @@
-package com.elisapolystar.exercise.v2;
+package com.elisapolystar.exercise;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -25,38 +25,31 @@ public class Server implements Runnable {
     public void run() {
         try {
             serverSocket = new ServerSocket(port);
-            System.out.println("Listening to port: " + port);
-
             clientSocket = serverSocket.accept();
-            System.out.println(clientSocket + " connected.");
 
             output = new DataOutputStream(clientSocket.getOutputStream());
             loadFile(path);
             stop();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void loadFile(String path) throws IOException {
-        int bytes = 0;
+
         File file = new File(path);
-        System.out.println("Loading file " + path);
         input = new FileInputStream(file);
         output.writeLong(file.length());
-        System.out.println("File lenght: " + file.length());
-        // break file into chunks
+
+        int bytes = 0;
         byte[] buffer = new byte[4*1024];
         while ((bytes=input.read(buffer))!=-1){
             output.write(buffer,0,bytes);
             output.flush();
         }
-        System.out.println("File transfered to client");
     }
 
     private void stop() throws IOException {
-        System.out.println("Stopping server resources.");
         output.close();
         input.close();
         clientSocket.close();
